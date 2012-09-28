@@ -4,7 +4,7 @@ LDFLAGS +=
 
 .PHONY: clean mrproper
 
-all: accessor_iterator property_traits accessor_property_map
+all: accessor_iterator property_traits accessor_property_map chained_output_iterator
 
 clean:
 	rm -rf build/*.o
@@ -34,4 +34,12 @@ accessor_property_map: build/accessor_property_map.o
 
 build/accessor_property_map.o: boost/libs/property_map/test/accessor_property_map.cpp \
 							   boost/boost/property_map/accessor_property_map.hpp
+	${CXX} -o $@ -c $< ${CXXFLAGS}
+
+
+chained_output_iterator: build/chained_output_iterator.o
+	${CXX} -o build/$@ $^ ${LDFLAGS}
+
+build/chained_output_iterator.o: boost/libs/iterator/test/chained_output_iterator.cpp \
+								 boost/boost/iterator/chained_output_iterator.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
