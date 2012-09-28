@@ -1,7 +1,9 @@
 // license here
 
 #include <algorithm>
+#include <boost/concept/assert.hpp>
 #include <boost/iterator/accessor_iterator.hpp>
+#include <boost/iterator/iterator_concepts.hpp>
 #include <cassert>
 #include <iterator>
 #include <string>
@@ -16,6 +18,31 @@ struct Person {
     std::string name;
     unsigned short age;
 };
+
+BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
+                        boost::accessor_iterator<
+                            std::vector<Person>::iterator,
+                            std::string
+                        >,
+                        std::string
+                    >));
+
+BOOST_CONCEPT_ASSERT((boost_concepts::ReadableIterator<
+                        boost::accessor_iterator<
+                            std::vector<Person>::const_iterator,
+                            std::string const
+                        >
+                    >));
+
+BOOST_CONCEPT_ASSERT((boost_concepts::LvalueIterator<
+                        boost::accessor_iterator<
+                            std::vector<Person>::iterator,
+                            std::string
+                        >
+                    >));
+
+// For traversal concepts, it models the same as its adapted iterator and it
+// is not _really_ necessary to test it because we use iterator_adaptor.
 
 typedef std::vector<Person> Persons;
 typedef Persons::iterator PersonIterator;

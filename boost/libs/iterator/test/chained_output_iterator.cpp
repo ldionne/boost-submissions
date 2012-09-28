@@ -1,14 +1,46 @@
 // license here
 
 #include <algorithm>
+#include <boost/concept/assert.hpp>
+#include <boost/concept_check.hpp>
 #include <boost/iterator/chained_output_iterator.hpp>
 #include <boost/iterator/counting_iterator.hpp>
+#include <boost/iterator/iterator_concepts.hpp>
 #include <cassert>
 #include <iterator>
 #include <vector>
 
 
 namespace {
+
+template <typename T>
+struct Identity {
+    typedef T result_type;
+    result_type operator()(T t) { return t; }
+};
+
+BOOST_CONCEPT_ASSERT((boost::OutputIterator<
+                        boost::chained_output_iterator<
+                            Identity<int>,
+                            std::back_insert_iterator<std::vector<int> >
+                        >,
+                        int
+                    >));
+
+BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
+                        boost::chained_output_iterator<
+                            Identity<int>,
+                            std::back_insert_iterator<std::vector<int> >
+                        >,
+                        int
+                    >));
+
+BOOST_CONCEPT_ASSERT((boost_concepts::IncrementableIterator<
+                        boost::chained_output_iterator<
+                            Identity<int>,
+                            std::back_insert_iterator<std::vector<int> >
+                        >
+                    >));
 
 template <int n>
 struct Multiply {

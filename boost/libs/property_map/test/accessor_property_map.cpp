@@ -1,6 +1,7 @@
 // license here
 
 #include <boost/property_map/accessor_property_map.hpp>
+#include <boost/property_map/property_map.hpp>
 #include <cassert>
 #include <string>
 
@@ -16,6 +17,10 @@ struct Person {
 
 typedef boost::accessor_property_map<std::string Person::*, &Person::name> NameOf;
 typedef boost::accessor_property_map<unsigned short Person::*, &Person::age> AgeOf;
+typedef boost::accessor_property_map<std::string const Person::*, &Person::name> ConstNameOf;
+
+BOOST_CONCEPT_ASSERT((boost::Mutable_LvaluePropertyMapConcept<NameOf, Person>));
+BOOST_CONCEPT_ASSERT((boost::LvaluePropertyMapConcept<ConstNameOf, Person const>));
 
 
 void should_return_right_attribute() {

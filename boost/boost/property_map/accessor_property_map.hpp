@@ -18,7 +18,7 @@ namespace detail {
     struct parse_memptr<Member Tag::*> {
         typedef Tag tag_type;
         typedef Member member_type;
-        typedef Member Tag::*member_ptr_type;
+        typedef Member Tag::* member_ptr_type;
     };
 } // end namespace detail
 
