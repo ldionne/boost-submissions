@@ -33,17 +33,18 @@ namespace boost {
   struct ReadablePropertyMapConcept
   {
     typedef typename property_traits<PMap>::key_type key_type;
+    typedef typename property_traits<PMap>::value_type value_type;
     typedef typename property_traits<PMap>::reference reference;
     typedef typename property_traits<PMap>::category Category;
     typedef boost::readable_property_map_tag ReadableTag;
     void constraints() {
       function_requires< ConvertibleConcept<Category, ReadableTag> >();
 
-      val = get(pmap, k);
+       value_type val = get(pmap, k);
+       ignore_unused_variable_warning(val);
     }
     PMap pmap;
     Key k;
-    typename property_traits<PMap>::value_type val;
   };
   template <typename KeyArchetype, typename ValueArchetype>
   struct readable_property_map_archetype {
