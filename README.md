@@ -39,10 +39,11 @@ two property maps and uses a value in the first one as a key in the second
 one to perform its `put`, `get`, and `operator[]` operations.
 
 #### boost.property\_map.property\_traits
-I feel like the `boost/property_map/property_map.hpp` header is a little bit
-bloated and not quite as modular as it could be. For now, I propose that we
-move the code dealing with `property_traits` into the
-`boost/property_map/property_traits.hpp` header and that we provide
-metafunctions to check for adherence to property map types. By providing
-an include in the `boost/property_map/property_map.hpp` header, backward
-compatibility is maintained and we simply increase modularity.
+I feel like the [property\_map.hpp](boost/boost/property_map/property_map.hpp)
+header is a little bit bloated and not quite as modular as it could be. For
+now, I propose that we move the code dealing with `property_traits` into the
+[property\_traits.hpp](boost/boost/property_map/property_traits.hpp)
+header and that we provide metafunctions to check for adherence to property
+map types. By providing an include in the
+[property\_map.hpp](boost/boost/property_map/property_map.hpp) header,
+backward compatibility is maintained and we simply increase modularity.
