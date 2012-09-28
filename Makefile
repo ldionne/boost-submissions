@@ -1,10 +1,11 @@
-CXX ?= gcc
+CXX ?= c++
 CXXFLAGS += -Wall -Wextra -pedantic -I `pwd`/boost
 LDFLAGS +=
 
 .PHONY: clean mrproper
 
-all: accessor_iterator property_traits accessor_property_map chained_output_iterator
+all: accessor_iterator property_traits accessor_property_map \
+	 chained_output_iterator chained_property_map
 
 clean:
 	rm -rf build/*.o
@@ -42,4 +43,12 @@ chained_output_iterator: build/chained_output_iterator.o
 
 build/chained_output_iterator.o: boost/libs/iterator/test/chained_output_iterator.cpp \
 								 boost/boost/iterator/chained_output_iterator.hpp
+	${CXX} -o $@ -c $< ${CXXFLAGS}
+
+
+chained_property_map: build/chained_property_map.o
+	${CXX} -o build/$@ $^ ${LDFLAGS}
+
+build/chained_property_map.o: boost/libs/property_map/test/chained_property_map.cpp \
+							  boost/boost/property_map/chained_property_map.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
