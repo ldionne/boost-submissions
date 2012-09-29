@@ -8,28 +8,17 @@
 
 namespace boost {
 
-namespace detail {
-    /**
-     * Metafunction extracting the tag and the member type of a
-     * pointer to member type.
-     */
-    template <typename T> struct parse_memptr;
-    template <typename Tag, typename Member>
-    struct parse_memptr<Member Tag::*> {
-        typedef Tag tag_type;
-        typedef Member member_type;
-        typedef Member Tag::* member_ptr_type;
-    };
-} // end namespace detail
-
 /**
  * A property map whose key is an object and whose value
  * is a member of the object.
  */
 template <typename MemberPtr, MemberPtr memptr>
-struct accessor_property_map {
-    typedef typename detail::parse_memptr<MemberPtr>::tag_type key_type;
-    typedef typename detail::parse_memptr<MemberPtr>::member_type value_type;
+struct accessor_property_map;
+
+template <typename Tag, typename MemberType, MemberType Tag::* memptr>
+struct accessor_property_map<MemberType Tag::*, memptr> {
+    typedef Tag key_type;
+    typedef MemberType value_type;
     typedef value_type& reference;
     typedef lvalue_property_map_tag category;
 
