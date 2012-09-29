@@ -22,8 +22,7 @@ struct Person {
 BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::iterator,
-                            std::string Person::*,
-                            &Person::name
+                            std::string
                         >,
                         std::string
                     >));
@@ -31,38 +30,35 @@ BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
 BOOST_CONCEPT_ASSERT((boost_concepts::ReadableIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::const_iterator,
-                            std::string const Person::*,
-                            &Person::name
+                            std::string const
                         >
                     >));
 
 BOOST_CONCEPT_ASSERT((boost_concepts::LvalueIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::iterator,
-                            std::string Person::*,
-                            &Person::name
+                            std::string
                         >
                     >));
 
 BOOST_CONCEPT_ASSERT((boost_concepts::RandomAccessTraversal<
                         boost::accessor_iterator<
                             std::vector<Person>::iterator,
-                            std::string Person::*,
-                            &Person::name
+                            std::string
                         >
                     >));
 
 typedef std::vector<Person> Persons;
 typedef Persons::iterator PersonIterator;
-typedef boost::accessor_iterator<PersonIterator, std::string Person::*, &Person::name> NameIterator;
-typedef boost::accessor_iterator<PersonIterator, unsigned short Person::*, &Person::age> AgeIterator;
+typedef boost::accessor_iterator<PersonIterator, std::string> NameIterator;
+typedef boost::accessor_iterator<PersonIterator, unsigned short> AgeIterator;
 
 void should_return_right_attribute() {
     Persons persons;
     Person john("john", 30);
     persons.push_back(john);
-    NameIterator name_of_john(persons.begin());
-    AgeIterator age_of_john(persons.begin());
+    NameIterator name_of_john(persons.begin(), &Person::name);
+    AgeIterator age_of_john(persons.begin(), &Person::age);
     assert(*name_of_john == "john");
     assert(*age_of_john == 30);
 }
@@ -71,7 +67,7 @@ void should_return_modifiable_reference() {
     Persons persons;
     Person john("john", 30);
     persons.push_back(john);
-    NameIterator name_of_john(persons.begin());
+    NameIterator name_of_john(persons.begin(), &Person::name);
     *name_of_john = "modified";
     assert(*name_of_john == "modified");
     assert(persons.begin()->name == "modified");
@@ -85,8 +81,8 @@ void should_work_in_standard_algorithm() {
     persons.push_back(Person("d", 4));
 
     std::vector<unsigned short> ages;
-    std::copy(AgeIterator(persons.begin()),
-              AgeIterator(persons.end()),
+    std::copy(AgeIterator(persons.begin(), &Person::age),
+              AgeIterator(persons.end(), &Person::age),
               std::back_inserter(ages));
 
     std::vector<unsigned short> ages_expected;
@@ -98,6 +94,25 @@ void should_work_in_standard_algorithm() {
     assert(ages == ages_expected);
 }
 
+void should_work_with_make_function() {
+    Persons persons;
+    persons.push_back(Person("a", 1));
+    persons.push_back(Person("b", 2));
+    persons.push_back(Person("c", 3));
+
+    std::vector<std::string> names;
+    std::copy(boost::make_accessor_iterator(persons.begin(), &Person::name),
+              boost::make_accessor_iterator(persons.end(), &Person::name),
+              std::back_inserter(names));
+
+    std::vector<std::string> expected;
+    expected.push_back("a");
+    expected.push_back("b");
+    expected.push_back("c");
+
+    assert(names == expected);
+}
+
 } // end anonymous namespace
 
 
@@ -105,5 +120,6 @@ int main(int, char const*[]) {
     should_return_right_attribute();
     should_return_modifiable_reference();
     should_work_in_standard_algorithm();
+    should_work_with_make_function();
     return 0;
 }
