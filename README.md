@@ -29,9 +29,7 @@ pipeline of operations without having to create temporary storage.
 #### boost.property\_map.accessor\_property\_map
 The `accessor_property_map` is a property map returning a reference to a
 member of the key it is given. It is much like the `accessor_iterator` for
-property maps. I wrote it when I was dealing with generic graph algorithms
-taking several property maps that actually map to members inside a single
-object, so this is at least one utility of it.
+property maps.
 
 #### boost.property\_map.chained\_property\_map
 The `chained_property_map` is a tool for property map composition. It takes
