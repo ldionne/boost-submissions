@@ -18,6 +18,62 @@ member of its pointee when dereferenced. I see it as another step in the
 direction of easier iterator composition, which has helped me writting less
 code in the past.
 
+Open questions regarding the final design:
+
+- Should the member accessed by the iterator be determined at compile time,
+  or should it be dynamic?
+
+        struct Foo {
+            int n;
+            int get_n() const
+            { return n; }
+        };
+        typedef std::vector<Foo>::iterator FooIterator;
+        std::vector<Foo> vec(10);
+
+        // Example of usage with dynamic pointer to member:
+        typedef boost::accessor_iterator<FooIterator, int Foo::*> FooNIterator;
+        FooNIterator it(vec.begin(), &Foo::n);
+
+        // Example of usage with compile time pointer to member:
+        typedef boost::accessor_iterator<FooIterator, int Foo::*, &Foo::n>
+                                                                FooNIterator;
+        FooNIterator it(vec.begin());
+
+
+- How should pointer to member functions be handled? With the current
+  naive implementation, trying to use the `accessor_iterator` with a
+  pointer to a member function causes a compilation error.
+
+  I have thought of three possible avenues:
+
+    - Do not support pointer to member functions.
+
+    - Return a wrapper like `mem_fn`.
+
+            typedef ... GetNIterator;
+            GetNIterator it(vec.begin());
+            boost::function<int (Foo const*)> get_n = *it;
+            get_n(&*vec.begin()); // equivalent to vec.begin()->get_n()
+
+    - Return a wrapper with its first argument (`this`) already bound, so the
+      member function is associated with the object it was obtained from.
+
+            typedef ... GetNIterator;
+            GetNIterator it(vec.begin());
+            boost::function<int ()> get_n = *it;
+            get_n(); // equivalent to vec.begin()->get_n()
+
+- Should the containing object's type be inferred from the adapted iterator's
+  `value_type`, or should it be passed explicitly?
+
+        // With inferred containing object:
+        typedef boost::accessor_iterator<Iterator, int, &Foo::n> It;
+
+        // With explicit containing object:
+        typedef boost::accessor_iterator<Iterator, int Foo::*, &Foo::n> It;
+
+
 #### boost.iterator.chained\_output\_iterator
 The `chained_output_iterator` is an iterator adaptor allowing to apply a
 functional transformation to a value before outputing it into another output
