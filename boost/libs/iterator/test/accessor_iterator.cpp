@@ -22,7 +22,8 @@ struct Person {
 BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::iterator,
-                            std::string
+                            std::string Person::*,
+                            &Person::name
                         >,
                         std::string
                     >));
@@ -30,31 +31,38 @@ BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
 BOOST_CONCEPT_ASSERT((boost_concepts::ReadableIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::const_iterator,
-                            std::string const
+                            std::string const Person::*,
+                            &Person::name
                         >
                     >));
 
 BOOST_CONCEPT_ASSERT((boost_concepts::LvalueIterator<
                         boost::accessor_iterator<
                             std::vector<Person>::iterator,
-                            std::string
+                            std::string Person::*,
+                            &Person::name
                         >
                     >));
 
-// For traversal concepts, it models the same as its adapted iterator and it
-// is not _really_ necessary to test it because we use iterator_adaptor.
+BOOST_CONCEPT_ASSERT((boost_concepts::RandomAccessTraversal<
+                        boost::accessor_iterator<
+                            std::vector<Person>::iterator,
+                            std::string Person::*,
+                            &Person::name
+                        >
+                    >));
 
 typedef std::vector<Person> Persons;
 typedef Persons::iterator PersonIterator;
-typedef boost::accessor_iterator<PersonIterator, std::string> NameIterator;
-typedef boost::accessor_iterator<PersonIterator, unsigned short> AgeIterator;
+typedef boost::accessor_iterator<PersonIterator, std::string Person::*, &Person::name> NameIterator;
+typedef boost::accessor_iterator<PersonIterator, unsigned short Person::*, &Person::age> AgeIterator;
 
 void should_return_right_attribute() {
     Persons persons;
     Person john("john", 30);
     persons.push_back(john);
-    NameIterator name_of_john(persons.begin(), &Person::name);
-    AgeIterator age_of_john(persons.begin(), &Person::age);
+    NameIterator name_of_john(persons.begin());
+    AgeIterator age_of_john(persons.begin());
     assert(*name_of_john == "john");
     assert(*age_of_john == 30);
 }
@@ -63,7 +71,7 @@ void should_return_modifiable_reference() {
     Persons persons;
     Person john("john", 30);
     persons.push_back(john);
-    NameIterator name_of_john(persons.begin(), &Person::name);
+    NameIterator name_of_john(persons.begin());
     *name_of_john = "modified";
     assert(*name_of_john == "modified");
     assert(persons.begin()->name == "modified");
@@ -77,8 +85,8 @@ void should_work_in_standard_algorithm() {
     persons.push_back(Person("d", 4));
 
     std::vector<unsigned short> ages;
-    std::copy(AgeIterator(persons.begin(), &Person::age),
-              AgeIterator(persons.end(), &Person::age),
+    std::copy(AgeIterator(persons.begin()),
+              AgeIterator(persons.end()),
               std::back_inserter(ages));
 
     std::vector<unsigned short> ages_expected;
@@ -90,14 +98,6 @@ void should_work_in_standard_algorithm() {
     assert(ages == ages_expected);
 }
 
-void test_with_make_function() {
-    Persons persons;
-    persons.push_back(Person("john", 30));
-    AgeIterator age = boost::make_accessor_iterator(persons.begin(),
-                                                    &Person::age);
-    assert(*age == 30);
-}
-
 } // end anonymous namespace
 
 
@@ -105,6 +105,5 @@ int main(int, char const*[]) {
     should_return_right_attribute();
     should_return_modifiable_reference();
     should_work_in_standard_algorithm();
-    test_with_make_function();
     return 0;
 }
