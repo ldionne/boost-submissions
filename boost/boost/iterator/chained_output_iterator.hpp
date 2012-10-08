@@ -30,7 +30,6 @@ class chained_output_iterator {
         template <typename T>
         OutputProxy& operator=(T const& x) {
             *out_ = f_(x);
-            ++out_;
             return *this;
         }
 
@@ -68,8 +67,17 @@ public:
         : f_(other.f_), out_(other.out_)
     { }
 
-    chained_output_iterator& operator++() { return *this; }
-    chained_output_iterator& operator++(int) { return *this; }
+    chained_output_iterator& operator++() {
+        ++out_;
+        return *this;
+    }
+
+    chained_output_iterator operator++(int) {
+        chained_output_iterator tmp(*this);
+        ++out_;
+        return tmp;
+    }
+
     OutputProxy operator*() { return OutputProxy(f_, out_); }
 };
 
