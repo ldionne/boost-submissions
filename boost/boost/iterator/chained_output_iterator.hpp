@@ -22,8 +22,9 @@ class chained_output_iterator {
     Function f_;
     OutputIterator out_;
 
+    template <typename Fun, typename It>
     struct OutputProxy {
-        explicit OutputProxy(Function& f, OutputIterator& out)
+        explicit OutputProxy(Fun& f, It& out)
             : f_(f), out_(out)
         { }
 
@@ -33,8 +34,8 @@ class chained_output_iterator {
             return *this;
         }
 
-        Function& f_;
-        OutputIterator& out_;
+        Fun& f_;
+        It& out_;
     };
 
 public:
@@ -78,7 +79,13 @@ public:
         return tmp;
     }
 
-    OutputProxy operator*() { return OutputProxy(f_, out_); }
+    OutputProxy<Function, OutputIterator> operator*() {
+        return OutputProxy<Function, OutputIterator>(f_, out_);
+    }
+
+    OutputProxy<Function const, OutputIterator const> operator*() const {
+        return OutputProxy<Function const, OutputIterator const>(f_, out_);
+    }
 };
 
 template <typename Function, typename OutputIterator>

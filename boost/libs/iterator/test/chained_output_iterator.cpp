@@ -132,6 +132,16 @@ void should_allow_construction_across_chain() {
     assert(vec.back() == (2 + 5) * 2 + 3);
 }
 
+void should_work_for_const_iterator_if_wrapped_iter_has_const_deref() {
+    typedef boost::chained_output_iterator<Multiply<2>,
+                Vector::iterator> OutputIter;
+    Vector vec(1);
+    OutputIter const out(vec.begin());
+    *out = 3;
+
+    assert(vec.front() == 2 * 3);
+}
+
 } // end anonymous namespace
 
 
@@ -140,5 +150,6 @@ int main(int, char const*[]) {
     test_with_deduction();
     should_allow_chains();
     should_allow_construction_across_chain();
+    should_work_for_const_iterator_if_wrapped_iter_has_const_deref();
     return 0;
 }
