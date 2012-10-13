@@ -60,14 +60,6 @@ public:
         : out_(out)
     { }
 
-    template <typename Func, typename OutIter>
-    chained_output_iterator(
-        chained_output_iterator<Func, OutIter> const& other,
-        typename enable_if_convertible<Func, Function>::type* =0,
-        typename enable_if_convertible<OutIter, OutputIterator>::type* =0)
-        : f_(other.f_), out_(other.out_)
-    { }
-
     chained_output_iterator& operator++() {
         ++out_;
         return *this;
