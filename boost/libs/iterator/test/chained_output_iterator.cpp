@@ -116,7 +116,6 @@ void should_allow_chains() {
 }
 
 void should_allow_construction_across_chain() {
-    // Compile-time test to make sure the convertion constructor works.
     typedef boost::chained_output_iterator<Multiply<2>,
                 boost::chained_output_iterator<Add<3>,
                     std::back_insert_iterator<Vector> > > Midway;

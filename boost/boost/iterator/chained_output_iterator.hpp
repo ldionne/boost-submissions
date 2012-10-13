@@ -45,19 +45,19 @@ public:
     typedef void difference_type;
     typedef incrementable_traversal_tag iterator_category;
 
-    template <typename OutIter>
+    template <typename Iterator>
     explicit chained_output_iterator(
         Function const& f,
-        OutIter const& out,
-        typename enable_if_convertible<OutIter, OutputIterator>::type* =0)
-        : f_(f), out_(out)
+        Iterator const& iterator,
+        typename enable_if_convertible<Iterator, OutputIterator>::type* =0)
+        : f_(f), out_(iterator)
     { }
 
-    template <typename OutIter>
+    template <typename Iterator>
     chained_output_iterator(
-        OutIter const& out,
-        typename enable_if_convertible<OutIter, OutputIterator>::type* =0)
-        : out_(out)
+        Iterator const& iterator,
+        typename enable_if_convertible<Iterator, OutputIterator>::type* =0)
+        : out_(iterator)
     { }
 
     chained_output_iterator& operator++() {
