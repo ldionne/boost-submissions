@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
-#include <boost/iterator/chained_output_iterator.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/iterator_concepts.hpp>
+#include <boost/iterator/transform_output_iterator.hpp>
 #include <cassert>
 #include <iterator>
 #include <vector>
@@ -20,7 +20,7 @@ struct Identity {
 };
 
 BOOST_CONCEPT_ASSERT((boost::OutputIterator<
-                        boost::chained_output_iterator<
+                        boost::transform_output_iterator<
                             Identity<int>,
                             std::back_insert_iterator<std::vector<int> >
                         >,
@@ -28,7 +28,7 @@ BOOST_CONCEPT_ASSERT((boost::OutputIterator<
                     >));
 
 BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
-                        boost::chained_output_iterator<
+                        boost::transform_output_iterator<
                             Identity<int>,
                             std::back_insert_iterator<std::vector<int> >
                         >,
@@ -36,7 +36,7 @@ BOOST_CONCEPT_ASSERT((boost_concepts::WritableIterator<
                     >));
 
 BOOST_CONCEPT_ASSERT((boost_concepts::IncrementableIterator<
-                        boost::chained_output_iterator<
+                        boost::transform_output_iterator<
                             Identity<int>,
                             std::back_insert_iterator<std::vector<int> >
                         >
@@ -62,7 +62,7 @@ typedef std::vector<int> Vector;
 typedef std::back_insert_iterator<Vector> BackInserter;
 template <int n>
 struct AddingBackInserter {
-    typedef boost::chained_output_iterator<Add<n>, BackInserter> type;
+    typedef boost::transform_output_iterator<Add<n>, BackInserter> type;
 };
 
 
@@ -83,7 +83,7 @@ void should_transform_output() {
 void test_with_deduction() {
     Vector vec;
     AddingBackInserter<10>::type out =
-        boost::make_chained_output_iterator(Add<10>(), BackInserter(vec));
+        boost::make_transform_output_iterator(Add<10>(), BackInserter(vec));
 
     std::copy(boost::counting_iterator<int>(0),
               boost::counting_iterator<int>(10),
@@ -100,7 +100,7 @@ void test_with_deduction() {
 void should_allow_chains() {
     Vector vec;
     typedef AddingBackInserter<10>::type Add10;
-    typedef boost::chained_output_iterator<Multiply<2>, Add10> Mul2Plus10;
+    typedef boost::transform_output_iterator<Multiply<2>, Add10> Mul2Plus10;
     std::copy(boost::counting_iterator<int>(0),
               boost::counting_iterator<int>(5),
               Mul2Plus10(Add10(BackInserter(vec))));
@@ -116,13 +116,22 @@ void should_allow_chains() {
 }
 
 void should_work_for_const_iterator_if_wrapped_iter_has_const_deref() {
-    typedef boost::chained_output_iterator<Multiply<2>,
+    typedef boost::transform_output_iterator<Multiply<2>,
                 Vector::iterator> OutputIter;
     Vector vec(1);
     OutputIter const out(vec.begin());
     *out = 3;
 
     assert(vec.front() == 2 * 3);
+}
+
+void test_dynamic_composition_of_functions() {
+    typedef boost::transform_output_iterator<Multiply<2>,
+                Vector::iterator> Mul2;
+    Vector vec(10);
+    Mul2 mul2(vec.begin());
+    *mul2.and_then(Multiply<10>()).and_then(Add<2>()) = 2;
+    assert(vec[0] == 42);
 }
 
 } // end anonymous namespace
@@ -133,5 +142,6 @@ int main(int, char const*[]) {
     test_with_deduction();
     should_allow_chains();
     should_work_for_const_iterator_if_wrapped_iter_has_const_deref();
+    test_dynamic_composition_of_functions();
     return 0;
 }
