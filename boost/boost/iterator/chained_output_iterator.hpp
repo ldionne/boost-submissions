@@ -4,8 +4,6 @@
 #define BOOST_ITERATOR_CHAINED_OUTPUT_ITERATOR_HPP
 
 #include <boost/iterator/iterator_categories.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/utility/enable_if.hpp>
 
 
 namespace boost {
@@ -16,9 +14,6 @@ namespace boost {
  */
 template <typename Function, typename OutputIterator>
 class chained_output_iterator {
-    template <typename From, typename To>
-    struct enable_if_convertible : enable_if<is_convertible<From, To> > { };
-
     Function f_;
     OutputIterator out_;
 
@@ -45,18 +40,12 @@ public:
     typedef void difference_type;
     typedef incrementable_traversal_tag iterator_category;
 
-    template <typename Iterator>
-    explicit chained_output_iterator(
-        Function const& f,
-        Iterator const& iterator,
-        typename enable_if_convertible<Iterator, OutputIterator>::type* =0)
+    explicit chained_output_iterator(Function const& f,
+                                     OutputIterator const& iterator)
         : f_(f), out_(iterator)
     { }
 
-    template <typename Iterator>
-    chained_output_iterator(
-        Iterator const& iterator,
-        typename enable_if_convertible<Iterator, OutputIterator>::type* =0)
+    explicit chained_output_iterator(OutputIterator const& iterator)
         : out_(iterator)
     { }
 

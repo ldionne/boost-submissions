@@ -115,22 +115,6 @@ void should_allow_chains() {
     assert(vec == expected);
 }
 
-void should_allow_construction_across_chain() {
-    typedef boost::chained_output_iterator<Multiply<2>,
-                boost::chained_output_iterator<Add<3>,
-                    std::back_insert_iterator<Vector> > > Midway;
-    typedef boost::chained_output_iterator<Add<5>, Midway> OutputIter;
-    Vector vec;
-    OutputIter out1(std::back_inserter(vec));
-    *out1 = 1;
-
-    OutputIter out2(Midway(std::back_inserter(vec)));
-    *out2 = 2;
-
-    assert(vec.front() == (1 + 5) * 2 + 3);
-    assert(vec.back() == (2 + 5) * 2 + 3);
-}
-
 void should_work_for_const_iterator_if_wrapped_iter_has_const_deref() {
     typedef boost::chained_output_iterator<Multiply<2>,
                 Vector::iterator> OutputIter;
@@ -148,7 +132,6 @@ int main(int, char const*[]) {
     should_transform_output();
     test_with_deduction();
     should_allow_chains();
-    should_allow_construction_across_chain();
     should_work_for_const_iterator_if_wrapped_iter_has_const_deref();
     return 0;
 }
