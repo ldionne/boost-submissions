@@ -6,7 +6,7 @@
 #include <string>
 
 
-namespace {
+namespace accessor_property_map_test {
 
 struct Person {
     Person(std::string const& name_, unsigned short age_)
@@ -49,10 +49,11 @@ void subscript_operator_with_mutable_object() {
     assert(name == john.name);
 }
 
-} // end anonymous namespace
+} // end accessor_property_map_test namespace
 
 
 int main(int, char const*[]) {
+    using namespace accessor_property_map_test;
     should_return_right_attribute();
     get_with_mutable_object();
     put_should_change_attribute_value();

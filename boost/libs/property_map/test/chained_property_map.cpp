@@ -8,7 +8,7 @@
 #include <cassert>
 
 
-namespace {
+namespace chained_property_map_test {
 
 template <int n>
 struct Add {
@@ -71,10 +71,11 @@ void should_allow_chains() {
     assert(get(map, 2) == 20);
 }
 
-} // end anonymous namespace
+} // end chained_property_map_test namespace
 
 
 int main(int, char const*[]) {
+    using namespace chained_property_map_test;
     should_support_same_concept_as_second_property_map();
     should_map_to_correct_values();
     should_put_to_second_map();

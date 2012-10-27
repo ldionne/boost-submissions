@@ -4,12 +4,12 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/static_assert.hpp>
 
-
-typedef boost::readable_property_map_archetype<int, int> readable_property_map_archetype;
-typedef boost::writable_property_map_archetype<int, int> writable_property_map_archetype;
-typedef boost::read_write_property_map_archetype<int, int> read_write_property_map_archetype;
-typedef boost::lvalue_property_map_archetype<int, int> lvalue_property_map_archetype;
-typedef boost::mutable_lvalue_property_map_archetype<int, int> mutable_lvalue_property_map_archetype;
+struct dummy { };
+typedef boost::readable_property_map_archetype<dummy, dummy> readable_property_map_archetype;
+typedef boost::writable_property_map_archetype<dummy, dummy> writable_property_map_archetype;
+typedef boost::read_write_property_map_archetype<dummy, dummy> read_write_property_map_archetype;
+typedef boost::lvalue_property_map_archetype<dummy, dummy> lvalue_property_map_archetype;
+typedef boost::mutable_lvalue_property_map_archetype<dummy, dummy> mutable_lvalue_property_map_archetype;
 
 #define ASSERT_PMAP(pmap) \
     BOOST_STATIC_ASSERT(::boost::is_property_map<pmap>::value)

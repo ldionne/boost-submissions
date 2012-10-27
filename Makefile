@@ -41,7 +41,7 @@ build/accessor_property_map.o: boost/libs/property_map/test/accessor_property_ma
 transform_output_iterator: build/transform_output_iterator.o
 	${CXX} -o build/$@ $^ ${LDFLAGS}
 
-build/transform_output_iterator.o: boost/libs/iterator/test/transform_output_iterator.cpp \
+build/transform_output_iterator.o: boost/libs/iterator/test/transform_output_iterator_test.cpp \
 								 boost/boost/iterator/transform_output_iterator.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
 

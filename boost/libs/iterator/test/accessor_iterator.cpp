@@ -10,7 +10,7 @@
 #include <vector>
 
 
-namespace {
+namespace accessor_iterator_test {
 
 struct Person {
     Person(std::string const& name_, unsigned short age_)
@@ -98,10 +98,11 @@ void should_work_in_standard_algorithm() {
     assert(ages == ages_expected);
 }
 
-} // end anonymous namespace
+} // end accessor_iterator_test namespace
 
 
 int main(int, char const*[]) {
+    using namespace accessor_iterator_test;
     should_return_right_attribute();
     should_return_modifiable_reference();
     should_work_in_standard_algorithm();

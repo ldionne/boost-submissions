@@ -77,10 +77,15 @@ public:
     }
 };
 
-template <typename Function, typename OutputIterator>
-transform_output_iterator<Function, OutputIterator>
-make_transform_output_iterator(Function const& f, OutputIterator const& out)
-{ return transform_output_iterator<Function, OutputIterator>(f, out); }
+template <typename F, typename OutputIterator>
+transform_output_iterator<F, OutputIterator>
+make_transform_output_iterator(F const& f, OutputIterator const& out)
+{ return transform_output_iterator<F, OutputIterator>(f, out); }
+
+template <typename F, typename OutputIterator>
+transform_output_iterator<F, OutputIterator>
+make_transform_output_iterator(OutputIterator const& out)
+{ return transform_output_iterator<F, OutputIterator>(out); }
 
 } // end namespace boost
 
