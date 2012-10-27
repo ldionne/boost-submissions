@@ -17,7 +17,7 @@ mrproper:
 accessor_iterator: build/accessor_iterator.o
 	${CXX} -o build/$@ $^ ${LDFLAGS}
 
-build/accessor_iterator.o: boost/libs/iterator/test/accessor_iterator.cpp \
+build/accessor_iterator.o: boost/libs/iterator/test/accessor_iterator_test.cpp \
 						   boost/boost/iterator/accessor_iterator.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
 
@@ -25,7 +25,7 @@ build/accessor_iterator.o: boost/libs/iterator/test/accessor_iterator.cpp \
 property_traits: build/property_traits.o
 	${CXX} -o build/$@ $^ ${LDFLAGS}
 
-build/property_traits.o: boost/libs/property_map/test/property_traits.cpp \
+build/property_traits.o: boost/libs/property_map/test/property_traits_test.cpp \
 						 boost/boost/property_map/property_traits.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
 
@@ -33,7 +33,7 @@ build/property_traits.o: boost/libs/property_map/test/property_traits.cpp \
 accessor_property_map: build/accessor_property_map.o
 	${CXX} -o build/$@ $^ ${LDFLAGS}
 
-build/accessor_property_map.o: boost/libs/property_map/test/accessor_property_map.cpp \
+build/accessor_property_map.o: boost/libs/property_map/test/accessor_property_map_test.cpp \
 							   boost/boost/property_map/accessor_property_map.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
 
@@ -49,6 +49,6 @@ build/transform_output_iterator.o: boost/libs/iterator/test/transform_output_ite
 chained_property_map: build/chained_property_map.o
 	${CXX} -o build/$@ $^ ${LDFLAGS}
 
-build/chained_property_map.o: boost/libs/property_map/test/chained_property_map.cpp \
+build/chained_property_map.o: boost/libs/property_map/test/chained_property_map_test.cpp \
 							  boost/boost/property_map/chained_property_map.hpp
 	${CXX} -o $@ -c $< ${CXXFLAGS}
