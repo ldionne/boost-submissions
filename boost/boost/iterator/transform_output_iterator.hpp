@@ -4,26 +4,33 @@
 #define BOOST_ITERATOR_TRANSFORM_OUTPUT_ITERATOR_HPP
 
 #include <boost/iterator/iterator_categories.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/identity.hpp>
+#include <boost/mpl/not.hpp>
+#include <boost/utility/enable_if.hpp>
 
 
 namespace boost {
+
+template <typename Iterator> struct is_transform_output_iterator;
 
 /**
  * An output iterator applying a function to its pointee before chaining
  * it to another output iterator.
  */
-template <typename F, typename OutputIterator>
+template <typename UnaryFunction, typename Iterator>
 class transform_output_iterator {
-    F f_;
-    OutputIterator out_;
+    UnaryFunction f_;
+    Iterator out_;
 
-    template <typename F_, typename OutputIterator_>
+    template <typename UnaryFunction_, typename Iterator_>
     class output_proxy {
-        F_& f_;
-        OutputIterator_& out_;
+        UnaryFunction_& f_;
+        Iterator_& out_;
 
     public:
-        explicit output_proxy(F_& f, OutputIterator_& out)
+        explicit output_proxy(UnaryFunction_& f, Iterator_& out)
             : f_(f), out_(out)
         { }
 
@@ -34,6 +41,39 @@ class transform_output_iterator {
         }
     };
 
+    template <typename UnaryFunction_, typename Iterator_>
+    friend class transform_output_iterator;
+
+    template <typename It, typename F>
+    struct apply_append {
+        typedef typename It::template append<F>::type type;
+    };
+
+    template <typename G>
+    struct append {
+        typedef transform_output_iterator<UnaryFunction,
+            typename mpl::eval_if<is_transform_output_iterator<Iterator>,
+                apply_append<Iterator, G>,
+                mpl::identity<transform_output_iterator<G, Iterator> >
+            >::type
+        > type;
+    };
+
+    template <typename G>
+        typename enable_if<is_transform_output_iterator<Iterator>,
+    typename append<G>::type>::type and_then_impl(G const& g) const {
+        return typename append<G>::type(f_, out_.and_then_impl(g));
+    }
+
+    template <typename G>
+        typename enable_if<mpl::not_<is_transform_output_iterator<Iterator> >,
+    typename append<G>::type>::type and_then_impl(G const& g) const {
+        typedef transform_output_iterator<G, Iterator> last_type;
+        typedef transform_output_iterator<UnaryFunction, last_type>
+                                                            before_last_type;
+        return before_last_type(f_, last_type(g, out_));
+    }
+
 public:
     typedef void value_type;
     typedef void reference;
@@ -42,18 +82,16 @@ public:
     typedef incrementable_traversal_tag iterator_category;
 
     template <typename G>
-    transform_output_iterator<F,transform_output_iterator<G, OutputIterator> >
-    and_then(G const& g) const {
-        typedef transform_output_iterator<G, OutputIterator> aux;
-        return transform_output_iterator<F, aux>(f_, aux(g, out_));
+    typename append<G>::type and_then(G const& g = G()) const {
+        return and_then_impl(g);
     }
 
-    explicit transform_output_iterator(F const& f,
-                                       OutputIterator const& iterator)
+    explicit transform_output_iterator(UnaryFunction const& f,
+                                       Iterator const& iterator)
         : f_(f), out_(iterator)
     { }
 
-    explicit transform_output_iterator(OutputIterator const& iterator)
+    explicit transform_output_iterator(Iterator const& iterator)
         : out_(iterator)
     { }
 
@@ -68,24 +106,36 @@ public:
         return tmp;
     }
 
-    output_proxy<F, OutputIterator> operator*() {
-        return output_proxy<F, OutputIterator>(f_, out_);
+    output_proxy<UnaryFunction, Iterator> operator*() {
+        return output_proxy<UnaryFunction, Iterator>(f_, out_);
     }
 
-    output_proxy<F const, OutputIterator const> operator*() const {
-        return output_proxy<F const, OutputIterator const>(f_, out_);
+    output_proxy<UnaryFunction const, Iterator const> operator*() const {
+        return output_proxy<UnaryFunction const, Iterator const>(f_, out_);
     }
 };
 
-template <typename F, typename OutputIterator>
-transform_output_iterator<F, OutputIterator>
-make_transform_output_iterator(F const& f, OutputIterator const& out)
-{ return transform_output_iterator<F, OutputIterator>(f, out); }
+template <typename Iterator>
+struct is_transform_output_iterator
+    : false_type
+{ };
 
-template <typename F, typename OutputIterator>
-transform_output_iterator<F, OutputIterator>
-make_transform_output_iterator(OutputIterator const& out)
-{ return transform_output_iterator<F, OutputIterator>(out); }
+template <typename UnaryFunction, typename Iterator>
+struct is_transform_output_iterator<transform_output_iterator<UnaryFunction,
+                                                              Iterator> >
+    : true_type
+{ };
+
+template <typename UnaryFunction, typename Iterator>
+transform_output_iterator<UnaryFunction, Iterator>
+make_transform_output_iterator(UnaryFunction const& f,
+                               Iterator const& iterator)
+{ return transform_output_iterator<UnaryFunction, Iterator>(f, iterator); }
+
+template <typename UnaryFunction, typename Iterator>
+transform_output_iterator<UnaryFunction, Iterator>
+make_transform_output_iterator(Iterator const& iterator)
+{ return transform_output_iterator<UnaryFunction, Iterator>(iterator); }
 
 } // end namespace boost
 
