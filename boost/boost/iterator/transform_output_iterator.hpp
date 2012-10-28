@@ -129,13 +129,15 @@ struct is_transform_output_iterator<transform_output_iterator<UnaryFunction,
 template <typename UnaryFunction, typename Iterator>
 transform_output_iterator<UnaryFunction, Iterator>
 make_transform_output_iterator(UnaryFunction const& f,
-                               Iterator const& iterator)
-{ return transform_output_iterator<UnaryFunction, Iterator>(f, iterator); }
+                               Iterator const& iterator) {
+    return transform_output_iterator<UnaryFunction, Iterator>(f, iterator);
+}
 
 template <typename UnaryFunction, typename Iterator>
 transform_output_iterator<UnaryFunction, Iterator>
-make_transform_output_iterator(Iterator const& iterator)
-{ return transform_output_iterator<UnaryFunction, Iterator>(iterator); }
+make_transform_output_iterator(Iterator const& iterator) {
+    return transform_output_iterator<UnaryFunction, Iterator>(iterator);
+}
 
 } // end namespace boost
 
