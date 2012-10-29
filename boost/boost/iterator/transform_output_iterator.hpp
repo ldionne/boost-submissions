@@ -1,4 +1,6 @@
-// license here
+// Copyright Louis Dionne 2012. Use, modification and distribution is subject
+// to the Boost Software License, Version 1.0. (See accompanying file
+// LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_ITERATOR_TRANSFORM_OUTPUT_ITERATOR_HPP
 #define BOOST_ITERATOR_TRANSFORM_OUTPUT_ITERATOR_HPP
@@ -15,10 +17,6 @@ namespace boost {
 
 template <typename Iterator> struct is_transform_output_iterator_type;
 
-/**
- * An output iterator applying a function to its pointee before chaining
- * it to another output iterator.
- */
 template <typename UnaryFunction, typename Iterator>
 class transform_output_iterator {
     UnaryFunction f_;
