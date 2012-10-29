@@ -13,7 +13,7 @@
 
 namespace boost {
 
-template <typename Iterator> struct is_transform_output_iterator;
+template <typename Iterator> struct is_transform_output_iterator_type;
 
 /**
  * An output iterator applying a function to its pointee before chaining
@@ -52,7 +52,7 @@ class transform_output_iterator {
     template <typename G>
     struct append {
         typedef transform_output_iterator<UnaryFunction,
-            typename mpl::eval_if<is_transform_output_iterator<Iterator>,
+            typename mpl::eval_if<is_transform_output_iterator_type<Iterator>,
                 apply_append<Iterator, G>,
                 mpl::identity<transform_output_iterator<G, Iterator> >
             >::type
@@ -60,13 +60,14 @@ class transform_output_iterator {
     };
 
     template <typename G>
-        typename enable_if<is_transform_output_iterator<Iterator>,
+        typename enable_if<is_transform_output_iterator_type<Iterator>,
     typename append<G>::type>::type and_then_impl(G const& g) const {
         return typename append<G>::type(f_, out_.and_then_impl(g));
     }
 
     template <typename G>
-        typename enable_if<mpl::not_<is_transform_output_iterator<Iterator> >,
+        typename enable_if<mpl::not_<
+                                is_transform_output_iterator_type<Iterator> >,
     typename append<G>::type>::type and_then_impl(G const& g) const {
         typedef transform_output_iterator<G, Iterator> last_type;
         typedef transform_output_iterator<UnaryFunction, last_type>
@@ -116,15 +117,20 @@ public:
 };
 
 template <typename Iterator>
-struct is_transform_output_iterator
+struct is_transform_output_iterator_type
     : false_type
 { };
 
 template <typename UnaryFunction, typename Iterator>
-struct is_transform_output_iterator<transform_output_iterator<UnaryFunction,
-                                                              Iterator> >
+struct is_transform_output_iterator_type<
+                        transform_output_iterator<UnaryFunction, Iterator> >
     : true_type
 { };
+
+template <typename Iterator>
+bool is_transform_output_iterator(Iterator const&) {
+    return ::boost::is_transform_output_iterator_type<Iterator>::value;
+}
 
 template <typename UnaryFunction, typename Iterator>
 transform_output_iterator<UnaryFunction, Iterator>
