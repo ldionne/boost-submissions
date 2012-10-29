@@ -39,14 +39,15 @@ class transform_output_iterator {
         }
     };
 
-    template <typename UnaryFunction_, typename Iterator_>
-    friend class transform_output_iterator;
-
+    // Apply the append metafunction to a given type. This is only required
+    // for the eval_if construct below.
     template <typename It, typename F>
     struct apply_append {
         typedef typename It::template append<F>::type type;
     };
 
+    // Metafunction computing the type of a transform_output_iterator applying
+    // the G function after applying all the function it currently applies.
     template <typename G>
     struct append {
         typedef transform_output_iterator<UnaryFunction,
@@ -56,6 +57,11 @@ class transform_output_iterator {
             >::type
         > type;
     };
+
+    // We need to friend all types of transform_output_iterator because we
+    // need to access the and_then_impl method of out_.
+    template <typename UnaryFunction_, typename Iterator_>
+    friend class transform_output_iterator;
 
     template <typename G>
         typename enable_if<is_transform_output_iterator_type<Iterator>,
