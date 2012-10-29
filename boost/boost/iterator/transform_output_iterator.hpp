@@ -4,7 +4,7 @@
 #define BOOST_ITERATOR_TRANSFORM_OUTPUT_ITERATOR_HPP
 
 #include <boost/iterator/iterator_categories.hpp>
-#include <boost/mpl/bool.hpp>
+#include <boost/mpl/bool_fwd.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/not.hpp>
@@ -118,13 +118,13 @@ public:
 
 template <typename Iterator>
 struct is_transform_output_iterator_type
-    : false_type
+    : mpl::false_
 { };
 
 template <typename UnaryFunction, typename Iterator>
 struct is_transform_output_iterator_type<
                         transform_output_iterator<UnaryFunction, Iterator> >
-    : true_type
+    : mpl::true_
 { };
 
 template <typename Iterator>

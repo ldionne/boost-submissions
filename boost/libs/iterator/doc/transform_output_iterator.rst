@@ -185,8 +185,8 @@ IncrementableIterator and the OutputIterator concepts.
 
 MPL-compatible metafunction to determine whether a type is a
 ``transform_output_iterator``. ``is_transform_output_iterator_type`` inherits
-``boost::true_type`` if ``Iterator`` is a ``transform_output_iterator`` and
-``boost::false_type`` otherwise.
+``boost::mpl::true_`` if ``Iterator`` is a ``transform_output_iterator`` and
+``boost::mpl::false_`` otherwise.
 
 
 ::
