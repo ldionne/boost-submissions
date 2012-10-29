@@ -12,7 +12,7 @@
 
 :abstract:
     The transform output iterator creates an output iterator applying a
-    functional transformation to a value before outputing it in another
+    functional transformation to a value before outputting it in another
     iterator. It can be seen like the output iterator counterpart of the
     transform iterator.
 
@@ -57,8 +57,35 @@
 
 ``transform_output_iterator`` requirements
 ..........................................
-The type ``UnaryFunction`` must be CopyConstructible. ``Iterator`` must
-model the WritableIterator concept and must be incrementable.
+The type ``UnaryFunction`` must be CopyConstructible and Callable with any
+type that is assigned to the result of dereferencing the
+``transform_output_iterator``. ``Iterator`` must model the WritableIterator,
+Incrementable and CopyConstructible concepts.
+
+Callable Concept
+----------------
+A type models the Callable concept when it supports the call operator. For
+given objects ``f``, ``x`` of type ``F``, respectively ``X``, the following
+construct should be valid for ``F`` to model the Callable with ``X`` concept:
+
+=========  =================  ===========
+Construct  Description        Return Type
+---------  -----------------  -----------
+f(x)       Call f on x        unspecified
+=========  =================  ===========
+
+Incrementable Concept (shamelessly taken from ``function_input_iterator``'s documentation)
+------------------------------------------------------------------------------------------
+A type models the Incrementable Concept when it supports the pre- and post-
+increment operators. For a given object ``i`` with type ``I``, the following
+constructs should be valid:
+
+=========  =================  ===========
+Construct  Description        Return Type
+---------  -----------------  -----------
+i++        Post-increment i.  I
+++i        Pre-increment i.   I&
+=========  =================  ===========
 
 
 ``transform_output_iterator`` models
@@ -128,6 +155,7 @@ IncrementableIterator and the OutputIterator concepts.
     returned iterator is equivalent to ``g(f_(x))``, which means that ``g``
     is applied to the result of ``f_``.
 
+
 ::
 
     template <typename UnaryFunction, typename Iterator>
@@ -138,6 +166,7 @@ IncrementableIterator and the OutputIterator concepts.
     An instance of ``transform_output_iterator<UnaryFunction, Iterator>`` with
     ``f_`` initialized to ``f`` and ``out_`` initialized to ``iterator``.
 
+
 ::
 
     template <typename UnaryFunction, typename Iterator>
@@ -147,6 +176,25 @@ IncrementableIterator and the OutputIterator concepts.
 :Returns:
     An instance of ``transform_output_iterator<UnaryFunction, Iterator>`` with
     ``f_`` default constructed and ``out_`` initialized to ``iterator``.
+
+
+::
+
+    template <typename Iterator>
+    struct is_transform_output_iterator_type;
+
+MPL-compatible metafunction to determine whether a type is a
+``transform_output_iterator``. ``is_transform_output_iterator_type`` inherits
+``boost::true_type`` if ``Iterator`` is a ``transform_output_iterator`` and
+``boost::false_type`` otherwise.
+
+
+::
+
+    template <typename Iterator>
+    bool is_transform_output_iterator(Iterator const&);
+
+:Returns: ``::boost::is_transform_output_iterator_type<Iterator>::value``.
 
 
 Example 1
