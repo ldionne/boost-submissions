@@ -86,6 +86,6 @@ ASSERT_MUTABLE_LVALUE_PMAP(mutable_lvalue_property_map_archetype);
 #undef ASSERT_MUTABLE_LVALUE_PMAP
 
 
-int main(int, char const*[]) {
+int main() {
     return 0;
 }

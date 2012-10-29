@@ -146,7 +146,7 @@ void chain_performs_operation_in_right_order() {
 } // end transform_output_iterator_test namespace
 
 
-int main(int, char const*[]) {
+int main() {
     using namespace transform_output_iterator_test;
     should_transform_output();
     should_allow_chaining();

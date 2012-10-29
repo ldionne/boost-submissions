@@ -54,7 +54,7 @@ void subscript_operator_with_mutable_object() {
 } // end accessor_property_map_test namespace
 
 
-int main(int, char const*[]) {
+int main() {
     using namespace accessor_property_map_test;
     should_return_right_attribute();
     get_with_mutable_object();

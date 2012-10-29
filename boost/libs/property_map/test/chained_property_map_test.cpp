@@ -76,7 +76,7 @@ void should_allow_chains() {
 } // end chained_property_map_test namespace
 
 
-int main(int, char const*[]) {
+int main() {
     using namespace chained_property_map_test;
     should_support_same_concept_as_second_property_map();
     should_map_to_correct_values();
