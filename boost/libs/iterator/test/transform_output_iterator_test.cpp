@@ -143,6 +143,32 @@ void chain_performs_operation_in_right_order() {
     assert(actual == "abcd");
 }
 
+struct Input { };
+struct First {
+    struct result { };
+    result operator()(Input) const { return result(); }
+};
+struct Second {
+    struct result { };
+    result operator()(First::result) const { return result(); }
+};
+struct Third {
+    struct result { };
+    result operator()(Second::result) const { return result(); }
+};
+struct Output {
+    Output& operator++() { return *this; }
+    Output operator++(int) { return *this; }
+    Output& operator=(Third::result) { return *this; }
+    Output& operator*() { return *this; }
+};
+
+void test_ordering_of_operations_with_type_system() {
+    Output output;
+    *boost::make_transform_output_iterator<First>(output)
+        .and_then<Second>().and_then<Third>() = Input();
+}
+
 } // end transform_output_iterator_test namespace
 
 
@@ -152,5 +178,6 @@ int main() {
     should_allow_chaining();
     should_work_for_const_iterator_if_wrapped_iter_has_const_deref();
     chain_performs_operation_in_right_order();
+    test_ordering_of_operations_with_type_system();
     return 0;
 }
