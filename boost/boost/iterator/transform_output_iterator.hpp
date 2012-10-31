@@ -9,7 +9,6 @@
 #include <boost/mpl/bool_fwd.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/mpl/not.hpp>
 #include <boost/utility/enable_if.hpp>
 
 
@@ -70,8 +69,7 @@ class transform_output_iterator {
     }
 
     template <typename G>
-        typename enable_if<mpl::not_<
-                                is_transform_output_iterator_type<Iterator> >,
+        typename disable_if<is_transform_output_iterator_type<Iterator>,
     typename append<G>::type>::type and_then_impl(G const& g) const {
         typedef transform_output_iterator<G, Iterator> last_type;
         typedef transform_output_iterator<UnaryFunction, last_type>
