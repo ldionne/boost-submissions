@@ -1,8 +1,9 @@
-// Copyright Louis Dionne 2012. Use, modification and distribution is subject
-// to the Boost Software License, Version 1.0. (See accompanying file
+// (C) Copyright 2012 Louis Dionne
+// Use, modification and distribution are subject to the
+// Boost Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/iterator/transform_output_iterator.hpp>
+#include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
 #include <boost/concept_archetype.hpp>
@@ -10,9 +11,9 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/iterator_concepts.hpp>
 #include <boost/iterator/iterator_traits.hpp>
+#include <boost/iterator/transform_output_iterator.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -95,7 +96,7 @@ void should_transform_output() {
               boost::counting_iterator<int>(20),
               std::back_inserter(expected));
 
-    assert(actual == expected);
+    BOOST_ASSERT(actual == expected);
 }
 
 void should_allow_chaining() {
@@ -117,7 +118,7 @@ void should_allow_chaining() {
     expected.push_back(3 * 2 + 10);
     expected.push_back(4 * 2 + 10);
 
-    assert(actual == expected);
+    BOOST_ASSERT(actual == expected);
 }
 
 void should_work_for_const_iterator_if_wrapped_iter_has_const_deref() {
@@ -129,7 +130,7 @@ void should_work_for_const_iterator_if_wrapped_iter_has_const_deref() {
 
     expected.push_back(2 * 3);
 
-    assert(actual == expected);
+    BOOST_ASSERT(actual == expected);
 }
 
 void chain_performs_operation_in_right_order() {
@@ -140,9 +141,10 @@ void chain_performs_operation_in_right_order() {
                                  .and_then(Append("c"))
                                  .and_then(Append("d")) = "";
 
-    assert(actual == "abcd");
+    BOOST_ASSERT(actual == "abcd");
 }
 
+// Compile time test
 struct Input { };
 struct First {
     struct result { };
@@ -166,7 +168,24 @@ struct Output {
 void test_ordering_of_operations_with_type_system() {
     Output output;
     *boost::make_transform_output_iterator<First>(output)
-        .and_then<Second>().and_then<Third>() = Input();
+        .and_then<Second>().and_then<Third>()++ = Input();
+}
+
+// Compile time test.
+First::result first(Input i) { return First()(i); }
+Second::result second(First::result r) { return Second()(r); }
+Third::result third(Second::result r) { return Third()(r); }
+
+void test_should_accept_raw_functions() {
+    Output output;
+
+    // Test construction with a raw function.
+    boost::transform_output_iterator<
+                            First::result(Input), Output> it(first, output);
+
+    // Test composition with a raw function.
+    *boost::make_transform_output_iterator(first, output)
+        .and_then(second).and_then(third)++ = Input();
 }
 
 } // end transform_output_iterator_test namespace
@@ -179,5 +198,6 @@ int main() {
     should_work_for_const_iterator_if_wrapped_iter_has_const_deref();
     chain_performs_operation_in_right_order();
     test_ordering_of_operations_with_type_system();
+    test_should_accept_raw_functions();
     return 0;
 }

@@ -1,5 +1,6 @@
-// Copyright Louis Dionne 2012. Use, modification and distribution is subject
-// to the Boost Software License, Version 1.0. (See accompanying file
+// (C) Copyright 2012 Louis Dionne
+// Use, modification and distribution are subject to the
+// Boost Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_ITERATOR_TRANSFORM_OUTPUT_ITERATOR_HPP
@@ -9,6 +10,7 @@
 #include <boost/mpl/bool_fwd.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/type_traits/decay.hpp>
 #include <boost/utility/enable_if.hpp>
 
 
@@ -16,18 +18,21 @@ namespace boost {
 
 template <typename Iterator> struct is_transform_output_iterator_type;
 
-template <typename UnaryFunction, typename Iterator>
+template <typename UnaryFunction_, typename Iterator>
 class transform_output_iterator {
+    // Use decay so we can accept function types.
+    typedef typename boost::decay<UnaryFunction_>::type UnaryFunction;
+
     UnaryFunction f_;
     Iterator out_;
 
-    template <typename UnaryFunction_, typename Iterator_>
+    template <typename UnaryFunc, typename Iter>
     class output_proxy {
-        UnaryFunction_& f_;
-        Iterator_& out_;
+        UnaryFunc& f_;
+        Iter& out_;
 
     public:
-        explicit output_proxy(UnaryFunction_& f, Iterator_& out)
+        explicit output_proxy(UnaryFunc& f, Iter& out)
             : f_(f), out_(out)
         { }
 
@@ -59,7 +64,7 @@ class transform_output_iterator {
 
     // We need to friend all types of transform_output_iterator because we
     // need to access the and_then_impl method of out_.
-    template <typename UnaryFunction_, typename Iterator_>
+    template <typename UF, typename I>
     friend class transform_output_iterator;
 
     template <typename G>
@@ -115,6 +120,12 @@ public:
 
     output_proxy<UnaryFunction const, Iterator const> operator*() const {
         return output_proxy<UnaryFunction const, Iterator const>(f_, out_);
+    }
+
+    template <typename G>
+    friend typename append<G>::type
+                operator|(transform_output_iterator const& self, G const& g) {
+        return self.and_then_impl(g);
     }
 };
 
