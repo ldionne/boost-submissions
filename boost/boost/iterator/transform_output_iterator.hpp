@@ -62,20 +62,20 @@ class transform_output_iterator {
         > type;
     };
 
-    // We need to friend all types of transform_output_iterator because we
-    // need to access the and_then_impl method of out_.
+    // We need to befriend all types of transform_output_iterator because we
+    // need to access the append_to_chain method of out_.
     template <typename UF, typename I>
     friend class transform_output_iterator;
 
     template <typename G>
         typename enable_if<is_transform_output_iterator_type<Iterator>,
-    typename append<G>::type>::type and_then_impl(G const& g) const {
-        return typename append<G>::type(f_, out_.and_then_impl(g));
+    typename append<G>::type>::type append_to_chain(G const& g) const {
+        return typename append<G>::type(f_, out_.append_to_chain(g));
     }
 
     template <typename G>
         typename disable_if<is_transform_output_iterator_type<Iterator>,
-    typename append<G>::type>::type and_then_impl(G const& g) const {
+    typename append<G>::type>::type append_to_chain(G const& g) const {
         typedef transform_output_iterator<G, Iterator> last_type;
         typedef transform_output_iterator<UnaryFunction, last_type>
                                                             before_last_type;
@@ -91,7 +91,7 @@ public:
 
     template <typename G>
     typename append<G>::type and_then(G const& g = G()) const {
-        return and_then_impl(g);
+        return append_to_chain(g);
     }
 
     explicit transform_output_iterator(UnaryFunction const& f,
@@ -125,7 +125,7 @@ public:
     template <typename G>
     friend typename append<G>::type
                 operator|(transform_output_iterator const& self, G const& g) {
-        return self.and_then_impl(g);
+        return self.append_to_chain(g);
     }
 };
 
