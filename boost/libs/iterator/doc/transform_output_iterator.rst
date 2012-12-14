@@ -43,6 +43,9 @@
         template <typename G>
         /* see below */ and_then(G const& g = G()) const;
 
+        template <typename G>
+        friend /* see below */ operator|(transform_output_iterator const&, G const&);
+
         explicit transform_output_iterator(UnaryFunction const& f, Iterator const& iterator);
 
         explicit transform_output_iterator(Iterator const& iterator);
@@ -158,6 +161,15 @@ IncrementableIterator and the OutputIterator concepts.
 
 ::
 
+    template <typename G>
+    friend transform_output_iterator<unspecified_type1, unspecified_type2>
+    operator|(transform_output_iterator const& self, G const& g);
+
+:Effects:
+    Equivalent to ``self.and_then(g)``.
+
+::
+
     template <typename UnaryFunction, typename Iterator>
     transform_output_iterator<UnaryFunction, Iterator>
     make_transform_output_iterator(UnaryFunction const& f, Iterator const& iterator);
@@ -261,11 +273,11 @@ pipeline of operations.
 
     int main() {
         std::string result;
-        *boost::make_transform_output_iterator(Append("w"), &result)
-                                     .and_then(Append("o"))
-                                     .and_then(Append("r"))
-                                     .and_then(Append("l"))
-                                     .and_then(Append("d")) = "hello ";
+        *(boost::make_transform_output_iterator(Append("w"), &result)
+                                            |   Append("o")
+                                            |   Append("r")
+                                            |   Append("l")
+                                            |   Append("d"))  = "hello ";
         std::cout << result << std::endl;
     }
 
