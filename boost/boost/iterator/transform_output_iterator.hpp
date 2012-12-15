@@ -16,6 +16,146 @@
 
 namespace boost {
 
+namespace detail {
+
+template <typename Derived, typename Iterator>
+class proxy_base {
+    template <typename OutputProxy>
+    friend class output_iterator;
+
+    Iterator out_;
+
+    Derived& derived() {
+        return *static_cast<Derived*>(this);
+    }
+
+    Derived const& derived() const {
+        return *static_cast<Derived const*>(this);
+    }
+
+    template <typename Proxy>
+    ... combine_with(Proxy const& other) {
+
+    }
+
+protected:
+    template <typename T>
+    void do_output(T const& t) {
+        *out_ = t;
+    }
+
+public:
+    template <typename T>
+    Derived& operator=(T const& x) {
+        this->derived().on_assignment(x);
+        return this->derived();
+    }
+
+    template <typename T>
+    Derived const& operator=(T const& x) const {
+        this->derived().on_assignment(x);
+        return this->derived();
+    }
+};
+
+
+template <typename Iterator>
+class identity_proxy : public proxy_base<identity_proxy<Iterator>, Iterator> {
+
+    template <typename T>
+    void on_assignment(T const& x) {
+        this->do_output(x);
+    }
+
+public:
+    explicit identity_proxy(Iterator const& out)
+        : proxy_base<Iterator>(out)
+    { }
+};
+
+template <typename Iterator, typename Predicate>
+class filter_proxy : public proxy_base<filter_proxy<Iterator>, Iterator> {
+    Predicate predicate_;
+
+    template <typename T>
+    void on_assignment(T const& x) {
+        if (predicate_(x))
+            this->do_output(x);
+    }
+
+public:
+    filter_proxy(Iterator const& out, Predicate const& predicate)
+        : proxy_base<Iterator>(out), predicate_(predicate)
+    { }
+};
+
+template <typename Iterator, typename UnaryFunction>
+class transform_proxy : public proxy_base<transform_proxy<Iterator>,Iterator>{
+    UnaryFunction f_;
+
+    template <typename T>
+    void on_assignment(T const& x) {
+        this->do_output(f_(x));
+    }
+
+public:
+    transform_proxy(Iterator const& out, UnaryFunction const& f)
+        : proxy_base<Iterator>(out), f_(f)
+    { }
+};
+
+template <typename Iterator, typename UnaryFunction>
+class indirect_proxy : public proxy_base<indirect_proxy<Iterator>, Iterator> {
+
+    template <typename T>
+    void on_assignment(T const& x) {
+        this->do_output(*x);
+    }
+
+public:
+    explicit indirect_proxy(Iterator const& out)
+        : proxy_base<Iterator>(out)
+    { }
+};
+
+
+template <typename OutputProxy>
+class output_iterator {
+    OutputProxy proxy_;
+
+public:
+    template <typename ...Args>
+    explicit output_iterator(Args ...args)
+        : proxy_(args...)
+    { }
+
+    output_iterator& operator++() {
+        ++proxy_.out_;
+        return *this;
+    }
+
+    output_iterator operator++(int) {
+        output_iterator tmp(*this);
+        ++proxy_.out_;
+        return tmp;
+    }
+
+    OutputProxy& operator*() {
+        return proxy_;
+    }
+
+    OutputProxy const& operator*() const {
+        return proxy_;
+    }
+
+    template <typename Proxy>
+    friend ... operator|(output_iterator const& self, Proxy const& other) {
+        return output_proxy<combination>(self.proxy_.combine_with(other));
+    }
+};
+
+} // end namespace detail
+
 template <typename Iterator> struct is_transform_output_iterator_type;
 
 template <typename UnaryFunction_, typename Iterator>
@@ -32,7 +172,7 @@ class transform_output_iterator {
         Iter& out_;
 
     public:
-        explicit output_proxy(UnaryFunc& f, Iter& out)
+        output_proxy(UnaryFunc& f, Iter& out)
             : f_(f), out_(out)
         { }
 
