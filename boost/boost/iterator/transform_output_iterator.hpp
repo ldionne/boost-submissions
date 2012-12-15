@@ -32,7 +32,7 @@ class transform_output_iterator {
         Iter& out_;
 
     public:
-        explicit output_proxy(UnaryFunc& f, Iter& out)
+        output_proxy(UnaryFunc& f, Iter& out)
             : f_(f), out_(out)
         { }
 
