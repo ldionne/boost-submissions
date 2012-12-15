@@ -136,15 +136,15 @@ IncrementableIterator and the OutputIterator concepts.
 
 :Returns:
     An output proxy applying ``f_`` to the value assigned to it before
-    forwarding it to ``out_``.
+    forwarding the result to ``out_``.
 
 
 ``output_proxy<UnaryFunction const, Iterator const> operator*() const;``
 
 :Returns:
     An output proxy applying ``f_`` to the value assigned to it before
-    forwarding it to ``out_``. Calling ``f_`` and dereferencing ``out_`` must
-    be operations marked with ``const``.
+    forwarding the result to ``out_``. Calling ``f_`` and dereferencing
+    ``out_`` must be operations marked with ``const``.
 
 ::
 
@@ -156,7 +156,7 @@ IncrementableIterator and the OutputIterator concepts.
     A ``transform_output_iterator`` with unspecified template parameters
     composing ``g`` and ``f_``. The functional transformation applied by the
     returned iterator is equivalent to ``g(f_(x))``, which means that ``g``
-    is applied to the result of ``f_``.
+    is applied to the result of calling ``f_``.
 
 
 ::
@@ -253,7 +253,7 @@ The output is::
 Example 2
 .........
 
-This is an example of composing ``transform_output_iterators`` to create a
+This is an example of composing ``transform_output_iterator``s to create a
 pipeline of operations.
 
 ::
@@ -284,3 +284,66 @@ pipeline of operations.
 The output is::
 
     hello world
+
+
+Example 3
+.........
+
+This is an example showing similarities between the ``transform_output_iterator``
+and the ``transform_iterator``. Depending on the circumstances, using the
+``transform_output_iterator`` may sometimes be the best alternative.
+
+::
+
+    #include <algorithm>
+    #include <boost/iterator/transform_iterator.hpp>
+    #include <boost/iterator/transform_output_iterator.hpp>
+    #include <boost/lambda/bind.hpp>
+    #include <boost/lambda/lambda.hpp>
+    #include <boost/range/begin.hpp>
+    #include <boost/range/end.hpp>
+    #include <iostream>
+    #include <iterator>
+    #include <string>
+
+
+    using namespace boost;
+
+    struct Person {
+        std::string name;
+        unsigned int age;
+    };
+
+    int main() {
+        Person dataset[] = {
+            {"Louis Dionne", 20},
+            {"Sylvester Stallone", 66},
+            {"Rick Astley", 46},
+            {"John Doe", 30}
+        };
+
+        std::ostream_iterator<std::string> out(std::cout, " ");
+
+        // Use the transform_iterator to extract the name of each person.
+        std::copy(make_transform_iterator(begin(dataset), lambda::bind(&Person::name, lambda::_1)),
+                  make_transform_iterator(end(dataset), lambda::bind(&Person::name, lambda::_1)),
+                  out);
+
+        std::cout << '\n';
+
+        // Use the transform_output_iterator to extract the name of each person.
+        std::copy(begin(dataset),
+                  end(dataset),
+                  make_transform_output_iterator(lambda::bind(&Person::name, lambda::_1), out));
+    }
+
+The output is::
+
+    Louis Dionne Sylvester Stallone Rick Astley John Doe
+    Louis Dionne Sylvester Stallone Rick Astley John Doe
+
+Like you see, in that scenario, using the ``transform_output_iterator`` allows
+us to type the functor only once whereas using the ``transform_iterator``
+requires typing it twice; once for the begin iterator and once for the end
+iterator. Also note that using the ``transform_output_iterator`` would allow
+us to chain more functors while the ``transform_iterator`` does not.
