@@ -7,8 +7,8 @@
 ++++++++++++++++++++++++++
 
 :Author: Louis Dionne
-:Contact: louis.dionne92@gmail.com
-:copyright: Copyright Louis Dionne 2012
+:Contact: ldionne.2@gmail.com
+:copyright: Copyright Louis Dionne 2013
 
 :abstract:
     The transform output iterator creates an output iterator applying a
